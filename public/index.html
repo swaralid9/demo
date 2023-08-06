@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>User Profile</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+         .profile-card {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: rgb(202, 230, 241);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        .profile-pic {
+            max-width: 170px;
+            max-height: 170px;
+            border-radius: 50%;
+            margin-bottom: 30px;
+            margin-left: -250px;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0px;
+            padding: 20px;
+            background-color: #f0f0f0;
+            background-image: url('https://media.istockphoto.com/id/1287065554/photo/sound-wave.webp?b=1&s=170667a&w=0&k=20&c=0IRToG5D5o2fM6U9N9n12Mnexdnz2xSIWD-ncnt5WAI='); 
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+
+        h1 {
+            color: #251774;
+            text-align: center;
+        }
+
+        .user-info {
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        .user-info label {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .user-info span {
+            display: inline-block;
+            color: #666;
+        }
+
+        .user-info:last-child {
+            margin-bottom: 30px;
+        }
+
+        .upload-btn-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+        }
+
+        .btn {
+            border: 2px solid gray;
+            color: gray;
+            background-color: white;
+            padding: 8px 20px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            margin-left: 300px;
+        }
+
+        .upload-btn-wrapper input[type=file] {
+            font-size: 100px;
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+        }
+        .ubtn{
+            margin-left: 0px;
+        }
+
+        .btn:hover {
+            cursor: pointer;
+            background-color: #f1f1f1;
+        }
+    
+.save-btn {
+  background-color: #5237ee; 
+  color: white; 
+  border: none; 
+  padding: 10px 20px;
+  font-size: 16px; 
+  border-radius: 5px; 
+  cursor: pointer; 
+  transition: background-color 0.3s ease;
+  margin-left: 120px;
+  margin-top: 20px; 
+}
+
+.save-btn:hover {
+  background-color: #150a49; 
+}
+
+.save-btn:active {
+  background-color: #5d3e8e; 
+}
+    </style>
+</head>
+<body>
+    <div class="profile-card">
+    <h1>My Profile</h1>
+   
+    <div class="user-info">
+        <label for="profilePic">Profile Picture:</label>
+        <input type="file" id="profilePic" accept="image/*">
+        <img class="profile-pic" id="profilePicPreview" src="#">
+    </div>
+    <button class="ubtn" onclick="uploadProfilePic()">Upload</button>
+
+    <div class="user-info">
+        <label for="username">Name:</label>
+        <span id="usernameSpan">Example</span>
+        <i class="fas fa-pencil-alt edit-icon" onclick="edit('username')"></i>
+        <input type="text" id="usernameInput" class="edit-input" value="Example" style="display: none;">
+    </div>
+    <div class="user-info">
+        <label for="email">Email:</label>
+        <span id="emailSpan">john@example.com</span>
+        <i class="fas fa-pencil-alt edit-icon" onclick="edit('email')"></i>
+        <input type="email" id="emailInput" class="edit-input" value="john@example.com" style="display: none;">
+    </div>
+    <div class="user-info">
+        <label for="address">Address:</label>
+        <span id="addressSpan">Andheri,Mumbai</span>
+        <i class="fas fa-pencil-alt edit-icon" onclick="edit('address')"></i>
+        <input type="text" id="addressInput" class="edit-input" value="Andheri,Mumbai" style="display: none;">
+    </div>
+    <div class="user-info">
+        <label for="city">City:</label>
+        <span id="citySpan">Mumbai</span>
+        <i class="fas fa-pencil-alt edit-icon" onclick="edit('city')"></i>
+        <input type="text" id="cityInput" class="edit-input" value="Mumbai" style="display: none;">
+    </div>
+    <div class="user-info">
+        <label for="contact">Contact no:</label>
+        <span id="contactSpan">0123456789</span>
+        <i class="fas fa-pencil-alt edit-icon" onclick="edit('contact')"></i>
+        <input type="text" id="contactInput" class="edit-input" value="0123456789" style="display: none;">
+    </div>
+
+    <button class="save-btn" onclick="saveChanges()">Save Changes</button>
+</div>
+    <script>
+       async function fetchProfilePic() {
+            try {
+                const response = await fetch('/api/user/profile-pic');
+                if (response.ok) {
+                    const data = await response.json();
+                    const profilePicPreview = document.getElementById('profilePicPreview');
+                    profilePicPreview.src = data.filePath;
+                }
+            } catch (error) {
+                console.error('Error fetching profile picture:', error);
+            }
+        }
+
+        function previewImage(event) {
+            const profilePicPreview = document.getElementById('profilePicPreview');
+            const file = event.target.files[0];
+            const reader = new FileReader();
+
+            reader.onload = function () {
+                profilePicPreview.src = reader.result;
+            };
+
+            if (file) {
+                reader.readAsDataURL(file);
+            }
+        }
+
+        async function uploadProfilePic() {
+            const fileInput = document.getElementById('profilePic');
+            const file = fileInput.files[0];
+
+            if (!file) {
+                console.error('No file selected.');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('profilePic', file);
+
+            try {
+                const response = await fetch('/api/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+                if (response.ok) {
+                    localStorage.setItem('profilePicPath', data.filePath);
+                    const profilePicPreview = document.getElementById('profilePicPreview');
+                    profilePicPreview.src = data.filePath;
+                } else {
+                    console.error('Error uploading profile picture:', data.error);
+                }
+            } catch (error) {
+                console.error('Error uploading profile picture:', error);
+            }
+        }
+        const profilePicPath = localStorage.getItem('profilePicPath');
+        if (profilePicPath) {
+            const profilePicPreview = document.getElementById('profilePicPreview');
+            profilePicPreview.src = profilePicPath;
+        } else {
+            fetchProfilePic();
+        }
+
+        // function edit(field) {
+        //     const infoSpan = document.getElementById(`${field}Span`);
+        // const inputElement = document.getElementById(`${field}Input`);
+
+        // if (infoSpan.style.display === 'inline') {
+        //     infoSpan.style.display = 'none';
+        //     inputElement.style.display = 'inline';
+        //     inputElement.focus();
+        // } else {
+        //     infoSpan.style.display = 'none';
+        //     inputElement.style.display = 'inline';
+        //     inputElement.focus();
+        // }
+        // }
+
+
+        function edit(field) {
+        const infoSpan = document.getElementById(`${field}Span`);
+        const inputElement = document.getElementById(`${field}Input`);
+
+        infoSpan.style.display = 'none';
+        inputElement.style.display = 'inline';
+        inputElement.focus();
+    }
+
+        function saveChanges() {
+            const usernameInput = document.getElementById('usernameInput');
+            const emailInput = document.getElementById('emailInput');
+            const addInput = document.getElementById('addressInput');
+            const cityInput = document.getElementById('cityInput');
+            const contactInput = document.getElementById('contactInput');
+
+            const username = usernameInput.value;
+            const email = emailInput.value;
+            const address = addInput.value;
+            const city = cityInput.value;
+            const contact = contactInput.value;
+
+            const usernameSpan = document.getElementById('usernameSpan');
+            const emailSpan = document.getElementById('emailSpan');
+            const addressSpan = document.getElementById('addressSpan');
+            const citySpan = document.getElementById('citySpan');
+            const contactSpan = document.getElementById('contactSpan');
+
+            usernameSpan.innerText = username;
+            emailSpan.innerText = email;
+            addressSpan.innerText = address;
+            citySpan.innerText = city;
+            contactSpan.innerText = contact;
+
+            localStorage.setItem('username', username);
+            localStorage.setItem('email', email);
+            localStorage.setItem('address', address);
+            localStorage.setItem('city', city);
+            localStorage.setItem('contact', contact);
+
+            window.alert('Profile Updated');
+        }
+
+        window.onload = function () {
+            const username = localStorage.getItem('username');
+            const email = localStorage.getItem('email');
+            const address = localStorage.getItem('address');
+            const city = localStorage.getItem('city');
+            const contact = localStorage.getItem('contact');
+
+            if (username) {
+                document.getElementById('usernameSpan').innerText = username;
+                document.getElementById('usernameInput').value = username;
+            }
+
+            if (email) {
+                document.getElementById('emailSpan').innerText = email;
+                document.getElementById('emailInput').value = email;
+            }
+
+            if (address) {
+                document.getElementById('addressSpan').innerText = address;
+                document.getElementById('addressInput').value = address;
+            }
+
+            if (city) {
+                document.getElementById('citySpan').innerText = city;
+                document.getElementById('cityInput').value = city;
+            }
+
+            if (contact) {
+                document.getElementById('contactSpan').innerText = contact;
+                document.getElementById('contactInput').value = contact;
+            }
+        };
+    </script>
+</body>
+</html>
